@@ -4,12 +4,17 @@ from flask import request
 from flask_cors import CORS
 import json
 from waitress import serve
+from Controladores.ControladorEstudiante import ControladorEstudiante
 
 
 app=Flask(__name__)
 cors = CORS(app)
-from Controladores.ControladorEstudiante import ControladorEstudiante
 miControladorEstudiante=ControladorEstudiante()
+
+def loadFileConfig():
+    with open('config.json') as f:
+        data = json.load(f)
+    return data
 
 @app.route("/",methods=['GET'])
 def test():
@@ -17,6 +22,7 @@ def test():
     json["message"]="Server running ..."
     return jsonify(json)
 
+########################### Estudiantes ######################################
 @app.route("/estudiantes",methods=['GET'])
 def getEstudiantes():
     json=miControladorEstudiante.index()
@@ -44,10 +50,11 @@ def eliminarEstudiante(id):
     json=miControladorEstudiante.delete(id)
     return jsonify(json)
 
-def loadFileConfig():
-    with open('config.json') as f:
-        data = json.load(f)
-    return data
+@app.route("/estudiantes/cedula/<string:cc>",methods=['GET'])
+def cedulaEstudiante(cc):
+    json=miControladorEstudiante.cedula(cc)
+    return jsonify(json)
+
 
 if __name__=='__main__':
     dataConfig = loadFileConfig()
